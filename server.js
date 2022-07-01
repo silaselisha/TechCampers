@@ -1,4 +1,10 @@
 const dotenv = require('dotenv')
+
+process.on('uncaughtException', (err) => {
+    console.log(err.name, err.message)
+    process.exit(1)
+})
+
 dotenv.config({path: './config/config.env'})
 const mongoose = require('mongoose')
 
@@ -19,6 +25,13 @@ mongoose.connect(databseURI, {})
     })
 
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`http://${localhost}:${port}`)
+})
+
+process.on('unhandledRejection', (err) => {
+    server.close(() => {
+         console.log(err.name, err.message)
+        process.exit(1)
+    })
 })

@@ -17,9 +17,10 @@ exports.getBootcamps = catchAsync(async (req, res, next) => {
 exports.getBootcamp = catchAsync(async (req, res, next) => {
     const id = req.params.id
     const bootcamp = await Bootcamp.findById(id)
+    console.log(bootcamp)
 
     if(!bootcamp) {
-        return next(400, 'Please provide a valid user id!')
+        return next(new AppError(404, 'Bootcamp not found!'))
     }
 
     res.status(200).json({
@@ -34,7 +35,7 @@ exports.createBootcamp = catchAsync(async (req, res, next) => {
     const bootcamp = await Bootcamp.create(req.body)
 
     if(!bootcamp) {
-        return next(new AppError(400, 'Please provide valid data!'))
+        return next(new AppError(404, 'Please provide valid data!'))
     }
 
     res.status(201).json({
@@ -55,7 +56,7 @@ exports.updateBootcamp = catchAsync(async (req, res, next) => {
     })
 
     if(!bootcamp) {
-        return next(400, 'Please provide a valid id and data!')
+        return next(new AppError(404, 'Please provide a valid id and data!'))
     }
 
     res.status(200).json({
@@ -72,9 +73,9 @@ exports.deleteBootcamp = catchAsync(async (req, res, next) => {
     const bootcamp = await Bootcamp.findByIdAndDelete(id)
 
     if(!bootcamp) {
-        return next(400, 'Invalid id! Please provide a valid id.')
+        return next(new AppError(404, 'Invalid id! Please provide a valid id.'))
     }
-    
+
     res.status(204).json({
         status: 'success',
         data: null
