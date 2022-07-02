@@ -2,6 +2,8 @@ const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 const Bootcamp = require('../models/Bootcamps')
 
+const geocoder = require('../utils/geocoder')
+
 exports.getBootcamps = catchAsync(async (req, res, next) => {
     const bootcamps = await Bootcamp.find({})
 
@@ -79,5 +81,33 @@ exports.deleteBootcamp = catchAsync(async (req, res, next) => {
     res.status(204).json({
         status: 'success',
         data: null
+    })
+})
+
+exports.getBootcampWithinRadius = catchAsync(async (req, res, next) => {
+    let {zipcode, distance, unit} = req.params
+
+    const loc = await geocoder.geocode(zipcode)
+    const longitude = loc[0].longitude
+    const latitude = loc[0].latitude
+
+    let earthRadius
+
+    unit === undefined ? unit = 'miles' : unit = unit
+    console.log(unit)
+    unit === 'miles' ? earthRadius = 3958.5 : unit === 'kms' ? earthRadius = 6371 :6371000
+
+    const radius = distance / earthRadius
+    const bootcamps = await Bootcamp.find({
+        location: {$geoWithin: {$centerSphere: [[longitude,latitude], radius]}}
+    })
+
+    console.log(earthRadius)
+    res.status(200).json({
+        status: 'success',
+        results: bootcamps.length,
+        dat: {
+            data: bootcamps
+        }
     })
 })

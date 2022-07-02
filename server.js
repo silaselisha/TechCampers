@@ -1,4 +1,5 @@
 const dotenv = require('dotenv')
+const colors = require('colors/safe')
 
 process.on('uncaughtException', (err) => {
     console.log(err.name, err.message)
@@ -18,7 +19,7 @@ const databseURI = process.env.DATABASE_URI.replace('<password>', process.env.DA
 
 mongoose.connect(databseURI, {})
     .then(({ connections }) => {
-        console.log(`Database connected on port ${connections[0].port}`)
+        console.log(colors.green.inverse(`Database connected on port ${connections[0].port}`))
     })
     .catch(err => {
         console.log(err.message)
