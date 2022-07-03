@@ -9,7 +9,7 @@ exports.getBootcamps = catchAsync(async (req, res, next) => {
     
     const ApiQuery = new QueryApi(Bootcamp.find(), req.query).filter().sort().limitFields().pagination()
 
-    const bootcamps = await ApiQuery.query
+    const bootcamps = await ApiQuery.query.populate('courses')
     
     res.status(200).json({
         status: 'success',
@@ -76,11 +76,13 @@ exports.updateBootcamp = catchAsync(async (req, res, next) => {
 exports.deleteBootcamp = catchAsync(async (req, res, next) => {
     const id = req.params.id
 
-    const bootcamp = await Bootcamp.findByIdAndDelete(id)
+    const bootcamp = await Bootcamp.findById(id)
 
     if(!bootcamp) {
         return next(new AppError(404, 'Invalid id! Please provide a valid id.'))
     }
+
+    bootcamp.remove()
 
     res.status(204).json({
         status: 'success',
