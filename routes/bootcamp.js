@@ -14,7 +14,7 @@ router.route('/:id')
     .put(updateBootcamp)
     .delete(deleteBootcamp)
 
-router.route('/radius/:zipcode&:distance/:unit?')
+router.route('/radius/:zipcode/:distance/:unit?')
     .get(getBootcampWithinRadius)
 
 module.exports = router

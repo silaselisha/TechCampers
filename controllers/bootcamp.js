@@ -1,12 +1,16 @@
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 const Bootcamp = require('../models/Bootcamps')
+const QueryApi = require('../utils/queryApi')
 
 const geocoder = require('../utils/geocoder')
 
 exports.getBootcamps = catchAsync(async (req, res, next) => {
-    const bootcamps = await Bootcamp.find({})
+    
+    const ApiQuery = new QueryApi(Bootcamp.find(), req.query).filter().sort().limitFields().pagination()
 
+    const bootcamps = await ApiQuery.query
+    
     res.status(200).json({
         status: 'success',
         results: bootcamps.length, 

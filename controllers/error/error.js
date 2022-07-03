@@ -51,7 +51,7 @@ const globalErrorHandler = (err, req, res, next) => {
 
 
     if(process.env.NODE_ENV === 'development') {
-        sendErrorToDeveloper(res, err)
+        sendErrorToDeveloper(err, res)
     }else if (process.env.NODE_ENV === 'production') {
         
         if(err.name === 'CastError') err = handleCastError(err)
