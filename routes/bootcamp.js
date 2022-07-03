@@ -3,7 +3,11 @@ const { route } = require('..')
 
 const { getBootcamps, getBootcamp, createBootcamp, updateBootcamp, deleteBootcamp, getBootcampWithinRadius } = require('../controllers/bootcamp')
 
+const coursesRouter = require('./courses')
+
 const router = express.Router()
+
+router.use('/:id/courses', coursesRouter)
 
 router.route('/')
     .get(getBootcamps)

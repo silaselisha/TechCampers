@@ -3,6 +3,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 
 const bootcampsRouter = require('./routes/bootcamp')
+const coursesRouter = require('./routes/courses')
+
 const globalErrorHandler = require('./controllers/error/error')
 const AppError = require('./utils/appError')
 
@@ -16,6 +18,7 @@ if(process.env.NODE_ENV === 'development') {
 }
 
 app.use('/api/v1/bootcamps', bootcampsRouter)
+app.use('/api/v1/courses', coursesRouter)
 
 app.all('*', (req, res, next) => {
     next(new AppError(404, `Cannot find ${req.originalUrl}`))
