@@ -22,8 +22,7 @@ exports.getBootcamps = catchAsync(async (req, res, next) => {
 
 exports.getBootcamp = catchAsync(async (req, res, next) => {
     const id = req.params.id
-    const bootcamp = await Bootcamp.findById(id)
-    console.log(bootcamp)
+    const bootcamp = await Bootcamp.findById(id).populate('courses')
 
     if(!bootcamp) {
         return next(new AppError(404, 'Bootcamp not found!'))
@@ -100,7 +99,6 @@ exports.getBootcampWithinRadius = catchAsync(async (req, res, next) => {
     let earthRadius
 
     unit === undefined ? unit = 'miles' : unit = unit
-    console.log(unit)
     unit === 'miles' ? earthRadius = 3958.5 : unit === 'kms' ? earthRadius = 6371 :6371000
 
     const radius = distance / earthRadius
@@ -108,7 +106,6 @@ exports.getBootcampWithinRadius = catchAsync(async (req, res, next) => {
         location: {$geoWithin: {$centerSphere: [[longitude,latitude], radius]}}
     })
 
-    console.log(earthRadius)
     res.status(200).json({
         status: 'success',
         results: bootcamps.length,

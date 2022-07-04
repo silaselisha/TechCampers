@@ -49,8 +49,14 @@ exports.createCourse = catchAsync(async (req, res, next) => {
   const id = req.params.id
   const data = req.body
 
-  data.bootcamp = id
 
+
+  const bootcamp = await Bootcamp.findById(id)
+  if(!bootcamp) {
+    return next(new AppError(404, 'Invalid data!'))
+  }
+
+  data.bootcamp = id
   const course = await Course.create(data)
 
   if(!course) {

@@ -41,7 +41,7 @@ class QueryApi {
 
     pagination() {
         const page = parseInt(this.queryObject.page) || 1
-        const limit = parseInt(this.queryObject.limit) || 2
+        const limit = parseInt(this.queryObject.limit) || 4
 
         const skip = (page - 1) * limit
         this.query = this.query.skip(skip).limit(limit)
