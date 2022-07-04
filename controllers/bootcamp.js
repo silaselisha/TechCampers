@@ -1,3 +1,5 @@
+const path = require('path')
+
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('../utils/appError')
 const Bootcamp = require('../models/Bootcamps')
@@ -112,5 +114,47 @@ exports.getBootcampWithinRadius = catchAsync(async (req, res, next) => {
         dat: {
             data: bootcamps
         }
+    })
+})
+
+exports.bootcampPhotoUpload = catchAsync(async (req, res, next) => {
+    const { file } = req.files
+    const id = req.params.id
+    const bootcamp = await Bootcamp.findById(id)
+
+    if(!bootcamp) {
+        return next(new AppError(404, 'Bootcamp does not exist!'))
+    }
+
+    if(!req.files) {
+        return next(new AppError(400, 'Upload a photo for a bootcamp!'))
+    }
+
+    if(!req.files.file.mimetype.startsWith('image')) {
+        return next(new AppError(400, 'Please upload an image jpeg/png/gif'))
+    }
+
+    if(req.files.file.size > process.env.FILE_SIZE) {
+        return next(new AppError(400, `Please upload a file less than ${process.env.FILE_SIZE}`))
+    }
+  
+    file.name = `photo_${id}${path.parse(file.name).ext}`
+
+    file.mv(path.join(process.env.UPLOAD_PATH, file.name), async (err) => {
+        if(err) {
+            console.log(err)
+            return next(new AppError(500, 'Internal server error'))
+        }
+
+        console.log(await Bootcamp.findByIdAndUpdate(id, {photo: file.name}, {
+            new: true
+        }))
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                data: file.name
+            }
+        })
     })
 })

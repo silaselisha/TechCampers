@@ -84,6 +84,10 @@ const bootcampSchema = new mongoose.Schema({
     },
     slug: String,
     averageCost: Number,
+    photo: {
+        type: String,
+        default: 'no-photo.jpeg'
+    },
     createdAt: {
         type: Date,
         default: Date.now(),
