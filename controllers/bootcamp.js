@@ -131,7 +131,7 @@ exports.bootcampPhotoUpload = catchAsync(async (req, res, next) => {
     }
 
     if(!req.files.file.mimetype.startsWith('image')) {
-        return next(new AppError(400, 'Please upload an image jpeg/png/gif'))
+        return next(new AppError(400, 'Please upload an image jpeg | png | gif'))
     }
 
     if(req.files.file.size > process.env.FILE_SIZE) {
