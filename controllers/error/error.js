@@ -22,6 +22,14 @@ const handleValidationError = (err) => {
     return new AppError(400, errorMessage)
 }
 
+const handleJsonWebTokenError = () => {
+    return new AppError(403, 'invalid signature')
+}
+
+const handleTokenExpiredError = () => {
+    return new AppError(403, 'jwt expired')
+}
+
 const sendErrorToDeveloper = (err, res) => {
     res.status(err.statusCode).json({
         status: err.status,
@@ -57,6 +65,8 @@ const globalErrorHandler = (err, req, res, next) => {
         if(err.name === 'CastError') err = handleCastError(err)
         if(err.name === 'MongoServerError') err = handleMongoServerError(err)
         if(err.name === 'ValidationError') err = handleValidationError(err)
+        if(err.name === 'JsonWebTokenError') err = handleJsonWebTokenError()
+        if(err.name === 'TokenExpiredError') err = handleTokenExpiredError()
 
         sendErrorToClient(err, res)
     }

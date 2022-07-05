@@ -1,3 +1,4 @@
+const { promisify } = require('util')
 const jwt = require('jsonwebtoken')
 const catchAsync = require('../../utils/catchAsync')
 const AppError = require('../../utils/appError')
@@ -31,13 +32,14 @@ const sendTokenAndCookie = (user, statusCode, req, res) => {
 }
 
 exports.signup = catchAsync(async (req, res, next) => {
-    const {name, email, password,  confirmPassword} = req.body
+    const {name, email, password,  confirmPassword, passwordChangedAt} = req.body
 
     const user = await User.create({
         name,
         email,
         password,
-        confirmPassword
+        confirmPassword,
+        passwordChangedAt
     })
 
     sendTokenAndCookie(user, 201, req, res)
@@ -57,4 +59,30 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
    sendTokenAndCookie(user, 200, req, res)
+})
+
+exports.protect = catchAsync(async  (req, res, next) => {
+    let token
+
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token = req.headers.authorization.split(' ')[1]
+    }
+
+    if(!token) {
+        return next(new AppError(401, 'Unauthorized to accesses this resource'))
+    }
+
+    const decode = await promisify(jwt.verify)(token, process.env.JWT_PRIVATE_KEY)
+
+    const user = await User.findById(decode.id)
+    if(!user) {
+        return next(new AppError(401, 'Unauthorized to access this resource'))
+    }
+
+    if(user.tokenExpiration(decode.iat)) {
+        return next(new AppError(403, 'Password was recently changed'))
+    }
+
+    req.user = user
+    next()
 })
