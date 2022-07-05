@@ -9,6 +9,27 @@ const generateToken = (id) => {
     })
 }
 
+const sendTokenAndCookie = (user, statusCode, req, res) => {
+    const options = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    }
+
+    const token = generateToken(user._id)
+    if(process.env.NODE_ENV === 'production') {
+        options.secure = true
+    }
+
+    user.password = undefined
+    res.status(statusCode).cookie('token', token, options).json({
+        status: 'success',
+        token,
+        data: {
+            data: user
+        }
+    })
+}
+
 exports.signup = catchAsync(async (req, res, next) => {
     const {name, email, password,  confirmPassword} = req.body
 
@@ -19,15 +40,7 @@ exports.signup = catchAsync(async (req, res, next) => {
         confirmPassword
     })
 
-    const token = generateToken(user._id)
-
-    res.status(201).json({
-        status: 'success',
-        token,
-        data: {
-            data: user
-        }
-    })
+    sendTokenAndCookie(user, 201, req, res)
 })
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -43,10 +56,5 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError(401, 'Provide valid user email or password! Register if you don\'t have an account.'))
     }
 
-    const token = generateToken(user._id)
-
-    res.status(200).json({
-        status: 'success',
-        token
-    })
+   sendTokenAndCookie(user, 200, req, res)
 })
