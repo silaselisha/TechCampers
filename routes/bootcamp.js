@@ -2,7 +2,7 @@ const express = require('express')
 
 const { getBootcamps, getBootcamp, createBootcamp, updateBootcamp, deleteBootcamp, getBootcampWithinRadius, bootcampPhotoUpload } = require('../controllers/bootcamp')
 
-const { protect } = require('../controllers/authentication/auth')
+const { protect, restrictTo} = require('../controllers/authentication/auth')
 
 const coursesRouter = require('./courses')
 
@@ -12,17 +12,17 @@ router.use('/:id/courses', coursesRouter)
 
 router.route('/')
     .get(getBootcamps)
-    .post(protect, createBootcamp)
+    .post (protect, restrictTo('admin', 'publisher'), createBootcamp)
 
 router.route('/:id')
     .get(protect, getBootcamp)
-    .put(protect, updateBootcamp)
-    .delete(protect, deleteBootcamp)
+    .put(protect, restrictTo('admin', 'publisher'), updateBootcamp)
+    .delete(protect, restrictTo('admin'), deleteBootcamp)
 
 router.route('/radius/:zipcode/:distance/:unit?')
     .get(getBootcampWithinRadius)
 
 router.route('/:id/photo')
-    .put(protect, bootcampPhotoUpload)
+    .put(protect, restrictTo('admin', 'publisher'), bootcampPhotoUpload)
 
 module.exports = router
