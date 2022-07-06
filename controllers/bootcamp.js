@@ -23,7 +23,6 @@ exports.getBootcamps = catchAsync(async (req, res, next) => {
 })
 
 exports.getBootcamp = catchAsync(async (req, res, next) => {
-    const id = req.params.id
     const bootcamp = await Bootcamp.findById(id).populate('courses')
 
     if(!bootcamp) {
@@ -39,6 +38,15 @@ exports.getBootcamp = catchAsync(async (req, res, next) => {
 })
 
 exports.createBootcamp = catchAsync(async (req, res, next) => {
+    const userId = req.user._id
+    req.body.user = userId
+
+    const publishedBootcamp = await Bootcamp.findOne({users: userId})
+   
+    if(publishedBootcamp && req.user.role !== 'admin') {
+        return next(new AppError(400, 'Publisher can publish only one bootcamp'))
+    }
+
     const bootcamp = await Bootcamp.create(req.body)
 
     if(!bootcamp) {
@@ -57,14 +65,20 @@ exports.updateBootcamp = catchAsync(async (req, res, next) => {
     const updateData = req.body
     const id = req.params.id
 
-    const bootcamp = await Bootcamp.findByIdAndUpdate(id, updateData, {
-        new: true,
-        runValidators: true
-    })
+    let bootcamp = await Bootcamp.findById(id)
 
     if(!bootcamp) {
         return next(new AppError(404, 'Please provide a valid id and data!'))
     }
+
+    if(bootcamp.user.toString() !== req.user._id && req.user.role !== 'admin') {
+        return next(new AppError(401, 'Owners and admin can only update'))
+    }
+
+    bootcamp = await Bootcamp.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true
+    })
 
     res.status(200).json({
         status: 'success',
@@ -137,6 +151,10 @@ exports.bootcampPhotoUpload = catchAsync(async (req, res, next) => {
     if(req.files.file.size > process.env.FILE_SIZE) {
         return next(new AppError(400, `Please upload a file less than ${process.env.FILE_SIZE}`))
     }
+
+    if(bootcamp.user.toString() !== req.user._id && req.user.role !== 'admin') {
+        return next(new AppError(401, 'Owners and admin can only update'))
+    }
   
     file.name = `photo_${id}${path.parse(file.name).ext}`
 
@@ -145,10 +163,6 @@ exports.bootcampPhotoUpload = catchAsync(async (req, res, next) => {
             console.log(err)
             return next(new AppError(500, 'Internal server error'))
         }
-
-        console.log(await Bootcamp.findByIdAndUpdate(id, {photo: file.name}, {
-            new: true
-        }))
 
         res.status(200).json({
             status: 'success',

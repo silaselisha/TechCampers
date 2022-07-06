@@ -32,9 +32,17 @@ const courseSchema = new mongoose.Schema({
     },
     bootcamp: {
         type: mongoose.Schema.Types.ObjectId,
-        required: [true, 'course should belong to atleast one bootcamp'],
-        ref: Bootcamp
+        ref: Bootcamp,
+        required: [true, 'course should belong to atleast one bootcamp']
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
+}, {
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
 })
 
 courseSchema.statics.calculateAverageCost = async function(bootcampId) {

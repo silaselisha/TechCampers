@@ -49,14 +49,19 @@ exports.createCourse = catchAsync(async (req, res, next) => {
   const id = req.params.id
   const data = req.body
 
-
-
   const bootcamp = await Bootcamp.findById(id)
+
   if(!bootcamp) {
     return next(new AppError(404, 'Invalid data!'))
   }
 
   data.bootcamp = id
+  data.user = req.user._id
+
+  if(bootcamp.users.toString() !== req.user._id && req.user.role !== 'admin') {
+      return next(new AppError(401, 'Owners and admin can only update'))
+  }
+  
   const course = await Course.create(data)
 
   if(!course) {
@@ -74,14 +79,20 @@ exports.createCourse = catchAsync(async (req, res, next) => {
 exports.updateCourse = catchAsync(async (req, res, next) => {
   const data = req.body
   const id = req.params.id
-  const course = await Course.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true
-  })
+  let course = await Course.findById(id, )
 
   if(!course) {
     return next(new AppError(4040, 'Invalid data!'))
   }
+
+  if(course.user.toString() !== req.user._id && req.user.role !== 'admin') {
+      return next(new AppError(401, 'Owners and admin can only update'))
+  }
+
+  course = await Course.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true
+  })
 
   res.status(200).json({
     status: 'success',
@@ -100,6 +111,9 @@ exports.deleteCourse= catchAsync(async (req, res, next) => {
     return next(new AppError(4040, 'Invalid data!'))
   }
 
+  if(course.user.toString() !== req.user._id && req.user.role !== 'admin') {
+    return next(new AppError(401, 'Owners and admin can only update'))
+  }
 
   course.remove()
   res.status(204).json({
