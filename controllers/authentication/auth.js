@@ -26,10 +26,7 @@ const sendTokenAndCookie = (user, statusCode, req, res) => {
     user.password = undefined
     res.status(statusCode).cookie('token', token, options).json({
         status: 'success',
-        token,
-        data: {
-            data: user
-        }
+        token
     })
 }
 
