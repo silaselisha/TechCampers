@@ -6,6 +6,7 @@ dotenv.config({path: '../../config/config.env'})
 
 const Bootcamp = require('../../models/Bootcamps')
 const Course = require('../../models/Courses')
+const User = require('../../models/Users')
 
 const database = process.env.DATABASE_URI.replace('<password>', process.env.DATABASE_PASSWORD)
 
@@ -19,12 +20,14 @@ mongoose.connect(database, {})
 
 const data = JSON.parse(fs.readFileSync('../bootcamps.json', 'utf-8'))
 const data1 = JSON.parse(fs.readFileSync('../courses.json', 'utf-8'))
+const data2 = JSON.parse(fs.readFileSync('../users.json', 'utf-8'))
 
 // IMPORT DATA
 const importData = async () => {
     try {
         await Bootcamp.create(data)
         await Course.create(data1)
+        await User.create(data2)
         console.log(colors.green.inverse('Data successfully imported...'))
     } catch(err) {
         console.log(err.message)
@@ -36,6 +39,7 @@ const destroyData = async () => {
     try {
         await Bootcamp.deleteMany()
         await Course.deleteMany()
+        await User.deleteMany()
         console.log(colors.red.inverse('Data successfully deleted...'))
     } catch(err) {
         console.log(err.message)
