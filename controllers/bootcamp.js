@@ -23,7 +23,8 @@ exports.getBootcamps = catchAsync(async (req, res, next) => {
 })
 
 exports.getBootcamp = catchAsync(async (req, res, next) => {
-    const bootcamp = await Bootcamp.findById(id).populate('courses')
+    const bootcampId = req.params.id
+    const bootcamp = await Bootcamp.findById(bootcampId).populate('courses')
 
     if(!bootcamp) {
         return next(new AppError(404, 'Bootcamp not found!'))

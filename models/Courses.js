@@ -69,7 +69,7 @@ courseSchema.statics.calculateAverageCost = async function(bootcampId) {
     }
 }
 
-courseSchema.post('save', async function(next) {
+courseSchema.post('save', async function() {
     this.constructor.calculateAverageCost(this.bootcamp)
 })
 

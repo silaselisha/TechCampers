@@ -5,10 +5,12 @@ const { getBootcamps, getBootcamp, createBootcamp, updateBootcamp, deleteBootcam
 const { protect, restrictTo} = require('../controllers/authentication/auth')
 
 const coursesRouter = require('./courses')
+const reviewsRouter = require('./reviews')
 
 const router = express.Router()
 
 router.use('/:id/courses', coursesRouter)
+router.use('/:id/reviews', reviewsRouter)
 
 router.route('/')
     .get(getBootcamps)

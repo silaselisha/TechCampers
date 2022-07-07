@@ -97,7 +97,11 @@ const bootcampSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }
+    },
+    ratingsAverage: {
+        type: Number,
+        default: 4.5
+    },
 }, {
     toJSON: {virtuals: true},
     toObject: {virtuals: true}

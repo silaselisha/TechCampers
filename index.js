@@ -9,6 +9,7 @@ const fileUpload = require('express-fileupload')
 const bootcampsRouter = require('./routes/bootcamp')
 const coursesRouter = require('./routes/courses')
 const usersRouter = require('./routes/users')
+const reviewsRouter = require('./routes/reviews')
 
 const globalErrorHandler = require('./controllers/error/error')
 const AppError = require('./utils/appError')
@@ -28,6 +29,7 @@ if(process.env.NODE_ENV === 'development') {
 app.use('/api/v1/bootcamps', bootcampsRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/courses', coursesRouter)
+app.use('/api/v1/reviews', reviewsRouter)
 
 app.all('*', (req, res, next) => {
     next(new AppError(404, `Cannot find ${req.originalUrl}`))
