@@ -154,3 +154,21 @@ exports.resetPassword = catchAsync(async (req, res,next) => {
 
     sendTokenAndCookie(user, 200, req, res)
 })
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+    const userId = req.user._id
+    const { currentPassword, password, confirmPassword } = req.body
+ 
+    const user = await User.findById(userId).select('+password')
+
+    if(!await user.comparePasswords(currentPassword, user.password)) {
+        return next(new AppError(401, 'Invalid data, passwords don\'t match'))
+    }
+
+    user.password = password
+    user.confirmPassword = confirmPassword
+
+    await user.save()
+
+    sendTokenAndCookie(user, 200, req, res)
+})
