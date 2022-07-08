@@ -32,7 +32,7 @@ const server = app.listen(port, () => {
 
 process.on('unhandledRejection', (err) => {
     server.close(() => {
-         console.log(err.name, err.message)
+        console.log(err.name, err.message)
         process.exit(1)
     })
 })
